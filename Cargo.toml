@@ -6,9 +6,9 @@ authors = ["antonkomarev"]
 
 [dependencies]
 axum = "0.7.7"
+clap = { version = "4.5.20", features = ["derive"] }
 http = "1.1.0"
 reqwest = "0.12.9"
 scraper = "0.21.0"
 serde = { version = "1.0.214", features = ["derive"] }
-tokio = { version = "1.41.0", features = ["full"] }
-clap = { version = "4.5.20", features = ["derive"] }
+tokio = { version = "1.41.0", features = ["rt-multi-thread"] }
