@@ -53,15 +53,19 @@ pub async fn invoke(
 
             (http::StatusCode::OK, axum::Json(response))
         }
-        Err(error) => (
-            http::StatusCode::OK,
-            axum::Json(Response {
-                error: Some(ResponseError {
-                    code: "CANNOT_RETRIEVE_DEVELOPERS".to_string(),
-                    detail: format!("{}", error),
+        Err(error) => {
+            println!("Failed to retrieve developers: {}", error);
+
+            (
+                http::StatusCode::OK,
+                axum::Json(Response {
+                    error: Some(ResponseError {
+                        code: "CANNOT_RETRIEVE_DEVELOPERS".to_string(),
+                        detail: format!("{}", error),
+                    }),
+                    result: None,
                 }),
-                result: None,
-            }),
-        ),
+            )
+        },
     }
 }

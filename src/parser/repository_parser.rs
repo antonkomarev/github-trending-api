@@ -19,10 +19,27 @@ pub async fn parse(
     let response = http_client.get(url).send().await?.text().await?;
     let document = scraper::Html::parse_document(&response);
 
-    let repository_element_list = scraper::Selector::parse("article.Box-row").unwrap();
     let mut repository_list: Vec<Repository> = Vec::new();
 
-    for (index, repository_element) in document.select(&repository_element_list).enumerate() {
+    let trending_header_selector = scraper::Selector::parse("h1").unwrap();
+    let trending_header_element = document.select(&trending_header_selector)
+        .find(|element| element.inner_html().trim() == "Trending");
+
+    if trending_header_element.is_none() {
+        return Err("Cannot find DOM node with GitHub trending header".into());
+    }
+
+    let empty_list_selector = scraper::Selector::parse(".blankslate").unwrap();
+    if document.select(&empty_list_selector).next().is_some() {
+        return Ok(repository_list);
+    }
+
+    let list_row_selector = scraper::Selector::parse("article.Box-row").unwrap();
+    if document.select(&list_row_selector).count() == 0 {
+        return Err("Cannot find DOM node with GitHub trending repository row".into());
+    }
+
+    for (index, repository_element) in document.select(&list_row_selector).enumerate() {
         let full_name_element = repository_element
             .select(&scraper::Selector::parse("h2 a").unwrap())
             .next()
